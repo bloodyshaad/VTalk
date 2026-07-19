@@ -1,0 +1,25 @@
+node_modules
+dist
+dist-ssr
+*.local
+.env
+.env.*
+!.env.example
+.DS_Store
+
+# Tauri
+src-tauri/target
+src-tauri/gen
+
+# Updater signing keys — NEVER commit
+src-tauri/tauri.key
+src-tauri/tauri.key.pub
+
+# Build logs / temp
+build.log
+build.err
+
+# TypeScript / Vite build artifacts
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts

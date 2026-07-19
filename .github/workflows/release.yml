@@ -1,0 +1,111 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Install webview2 fixed runtime (Windows)
+        run: |
+          Invoke-WebRequest https://github.com/webview/webview_runtime_releases/releases/download/110.0.1587.40/Microsoft.WebView2.FixedVersionRuntime.110.0.1587.40.x64.cab -OutFile webview2.cab
+          Expand .\webview2.cab -F:* .
+          Move-Item .\Microsoft.WebView2.FixedVersionRuntime.110.0.1587.40.x64\*\ .\WebView2Runtime -Force
+        shell: pwsh
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Import updater private key
+        # The TAURI_SIGNING_PRIVATE_KEY must match the pubkey in tauri.conf.json.
+        # Generate once with: `tauri signer generate -w ~/.tauri/vtalk.key`
+        # and store the private key as a repo secret.
+        run: |
+          New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.tauri" | Out-Null
+          Set-Content -NoNewline -Path "$env:USERPROFILE\.tauri\vtalk.key" -Value "$env:TAURI_SIGNING_PRIVATE_KEY"
+        shell: pwsh
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+
+      - name: Build and sign installer
+        run: npm run tauri build
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+
+      - name: Locate build artifacts
+        id: artifacts
+        run: |
+          $exe = Get-ChildItem src-tauri\target\release\bundle\nsis\*.exe | Select-Object -First 1
+          $sig = Get-ChildItem src-tauri\target\release\bundle\nsis\*.sig | Select-Object -First 1
+          "exe=$($exe.FullName)" | Out-File -Append $env:GITHUB_OUTPUT
+          "sig=$($sig.FullName)" | Out-File -Append $env:GITHUB_OUTPUT
+          "version=$(node -p "require('./package.json').version")" | Out-File -Append $env:GITHUB_OUTPUT
+        shell: pwsh
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ steps.artifacts.outputs.exe }}
+            ${{ steps.artifacts.outputs.sig }}
+          name: VTalk ${{ steps.artifacts.outputs.version }}
+          tag_name: ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish updates/latest.json
+        run: |
+          $ver = "${{ steps.artifacts.outputs.version }}"
+          $tag = "${{ github.ref_name }}"
+          $repo = "${{ github.repository }}"
+          $exeName = (Get-Item ${{ steps.artifacts.outputs.exe }}).Name
+          $sig = (Get-Content ${{ steps.artifacts.outputs.sig }} -Raw).Trim()
+          $notes = "Release $ver"
+          $manifest = @{
+            version = $ver
+            notes = $notes
+            pub_date = (Get-Date -AsUTC -UFormat "+%Y-%m-%dT%H:%M:%SZ")
+            platforms = @{
+              "windows-x86_64" = @{
+                url = "https://github.com/$repo/releases/download/$tag/$exeName"
+                signature = $sig
+              }
+            }
+          }
+          $json = $manifest | ConvertTo-Json -Depth 5
+          # Commit latest.json so raw.githubusercontent.com serves it.
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout origin/main -- updates/latest.json 2>$null
+          New-Item -ItemType Directory -Force -Path updates | Out-Null
+          Set-Content -Path updates/latest.json -Value $json -NoNewline
+          git add updates/latest.json
+          git commit -m "chore: update latest.json to $ver" || echo "no change"
+          git push origin HEAD:main
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

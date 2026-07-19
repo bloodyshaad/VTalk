@@ -1,0 +1,24 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "com.vtalk.desktop",
+  "description": "VTalk desktop application capabilities",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-close",
+    "core:window:allow-minimize",
+    "core:window:allow-toggle-maximize",
+    "core:webview:allow-internal-toggle-devtools",
+    "dialog:default",
+    "dialog:allow-open",
+    "opener:default",
+    "opener:allow-open-url",
+    "store:default",
+    "notification:default",
+    "log:default",
+    "updater:default",
+    "updater:allow-restart",
+    "process:default",
+    "process:allow-relaunch"
+  ]
+}

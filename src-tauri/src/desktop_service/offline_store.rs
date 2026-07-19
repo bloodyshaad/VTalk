@@ -239,6 +239,7 @@ impl OfflineStore {
     }
 
     // --- Upload queue -------------------------------------------------------
+    #[allow(clippy::too_many_arguments)]
     pub fn upsert_upload(
         &self,
         id: &str,
@@ -356,14 +357,4 @@ mod tests {
 
         let _ = std::fs::remove_dir_all(&dir);
     }
-}
-
-/// Current unix timestamp as a string (used for `created_at`/`updated_at` on
-/// local pending operations — precision is not security relevant here).
-fn now_iso() -> String {
-    let secs = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map(|d| d.as_secs())
-        .unwrap_or(0);
-    format!("{}", secs)
 }

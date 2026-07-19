@@ -131,10 +131,9 @@ impl UploadQueue {
         let items = self.items.lock().unwrap();
         match items.get(id) {
             Some(item) => {
-                let pct = if item.total == 0 {
-                    100
-                } else {
-                    (item.offset * 100 / item.total) as u32
+                let pct = match (item.offset * 100).checked_div(item.total) {
+                    Some(v) => v as u32,
+                    None => 100,
                 };
                 Ok(pct)
             }

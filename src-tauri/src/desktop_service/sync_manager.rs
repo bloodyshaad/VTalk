@@ -360,7 +360,7 @@ fn uuid() -> String {
 fn fastrand_like() -> u64 {
     use std::cell::Cell;
     thread_local! {
-        static STATE: Cell<u64> = Cell::new(0x9E3779B97F4A7C15);
+        static STATE: Cell<u64> = const { Cell::new(0x9E3779B97F4A7C15) };
     }
     STATE.with(|s| {
         let mut x = s.get();

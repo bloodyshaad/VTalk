@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 //! Audio noise suppression pipeline.
 //!
 //! In production this wraps RNNoise (or the WebRTC NS module) compiled as a

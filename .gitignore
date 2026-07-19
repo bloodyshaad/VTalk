@@ -18,6 +18,7 @@ src-tauri/tauri.key.pub
 # Build logs / temp
 build.log
 build.err
+src-tauri/clippy.log
 
 # TypeScript / Vite build artifacts
 *.tsbuildinfo

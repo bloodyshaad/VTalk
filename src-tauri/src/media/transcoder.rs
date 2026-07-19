@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::process::Command;
 
 /// Locate ffmpeg on PATH. Returns None if not installed.

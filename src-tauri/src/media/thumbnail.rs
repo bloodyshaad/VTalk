@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use image::{image_dimensions, GenericImageView, ImageFormat};
 use std::path::Path;
 

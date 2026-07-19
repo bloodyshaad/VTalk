@@ -17,6 +17,6 @@
     "notification:default",
     "log:default",
     "updater:default",
-    "process:allow-relaunch"
+    "process:default"
   ]
 }

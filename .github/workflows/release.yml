@@ -29,12 +29,12 @@ jobs:
         with:
           workspaces: "./src-tauri -> target"
 
-      - name: Install webview2 fixed runtime (Windows)
-        run: |
-          Invoke-WebRequest https://github.com/webview/webview_runtime_releases/releases/download/110.0.1587.40/Microsoft.WebView2.FixedVersionRuntime.110.0.1587.40.x64.cab -OutFile webview2.cab
-          Expand .\webview2.cab -F:* .
-          Move-Item .\Microsoft.WebView2.FixedVersionRuntime.110.0.1587.40.x64\*\ .\WebView2Runtime -Force
+      - name: Install WebView2 runtime (Windows)
         shell: pwsh
+        run: |
+          $installer = "$env:TEMP\MicrosoftEdgeWebview2Setup.exe"
+          Invoke-WebRequest "https://go.microsoft.com/fwlink/?LinkId=2124703" -OutFile $installer
+          Start-Process $installer -ArgumentList "/silent /install" -Wait
 
       - name: Install dependencies
         run: npm ci

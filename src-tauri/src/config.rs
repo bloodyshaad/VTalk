@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 pub mod auth {
     pub const SESSION_STORE: &str = "session.dat";
     pub const SESSION_KEY: &str = "jwt";

@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use x25519_dalek::{PublicKey, StaticSecret};
 
 /// Generate a fresh X25519 key pair.

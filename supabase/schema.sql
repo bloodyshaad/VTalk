@@ -415,6 +415,9 @@ DROP POLICY IF EXISTS "follows_select" ON follows;
 DROP POLICY IF EXISTS "follows_insert" ON follows;
 DROP POLICY IF EXISTS "follows_delete" ON follows;
 DROP POLICY IF EXISTS "chats_select" ON chats;
+DROP POLICY IF EXISTS "chats_insert" ON chats;
+DROP POLICY IF EXISTS "chats_update" ON chats;
+DROP POLICY IF EXISTS "chats_delete" ON chats;
 DROP POLICY IF EXISTS "chat_members_select" ON chat_members;
 DROP POLICY IF EXISTS "chat_members_insert" ON chat_members;
 DROP POLICY IF EXISTS "messages_select" ON messages;
@@ -528,14 +531,37 @@ CREATE POLICY "follows_delete" ON follows FOR DELETE USING (auth.uid() = followe
 CREATE POLICY "chats_select" ON chats FOR SELECT USING (
   EXISTS (SELECT 1 FROM chat_members cm WHERE cm.chat_id = chats.id AND cm.user_id = auth.uid())
 );
+CREATE POLICY "chats_insert" ON chats FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+CREATE POLICY "chats_update" ON chats FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM chat_members cm WHERE cm.chat_id = chats.id AND cm.user_id = auth.uid() AND cm.role = 'admin')
+) WITH CHECK (
+  EXISTS (SELECT 1 FROM chat_members cm WHERE cm.chat_id = chats.id AND cm.user_id = auth.uid() AND cm.role = 'admin')
+);
+CREATE POLICY "chats_delete" ON chats FOR DELETE USING (
+  EXISTS (SELECT 1 FROM chat_members cm WHERE cm.chat_id = chats.id AND cm.user_id = auth.uid() AND cm.role = 'admin')
+);
 CREATE POLICY "chat_members_select" ON chat_members FOR SELECT USING (user_id = auth.uid());
-CREATE POLICY "chat_members_insert" ON chat_members FOR INSERT WITH CHECK (user_id = auth.uid());
+CREATE POLICY "chat_members_insert" ON chat_members FOR INSERT WITH CHECK (
+  user_id = auth.uid()
+  OR EXISTS (
+    SELECT 1 FROM chat_members cm
+    WHERE cm.chat_id = chat_members.chat_id
+      AND cm.user_id = auth.uid()
+  )
+);
 
 -- MESSAGES
 CREATE POLICY "messages_select" ON messages FOR SELECT USING (
   EXISTS (SELECT 1 FROM chat_members cm WHERE cm.chat_id = messages.chat_id AND cm.user_id = auth.uid())
 );
-CREATE POLICY "messages_insert" ON messages FOR INSERT WITH CHECK (auth.uid() = sender_id);
+CREATE POLICY "messages_insert" ON messages FOR INSERT WITH CHECK (
+  auth.uid() = sender_id
+  AND EXISTS (
+    SELECT 1 FROM chat_members cm
+    WHERE cm.chat_id = messages.chat_id
+      AND cm.user_id = auth.uid()
+  )
+);
 CREATE POLICY "messages_update_own" ON messages FOR UPDATE USING (auth.uid() = sender_id) WITH CHECK (auth.uid() = sender_id);
 CREATE POLICY "messages_delete" ON messages FOR DELETE USING (auth.uid() = sender_id);
 CREATE POLICY "message_reads_select" ON message_reads FOR SELECT USING (user_id = auth.uid());

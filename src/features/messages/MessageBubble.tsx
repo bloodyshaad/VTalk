@@ -1,4 +1,3 @@
-import { UserAvatar } from "@/components/common/Avatar";
 import { timeAgo } from "@/lib/utils";
 import type { Message } from "@/types/models";
 

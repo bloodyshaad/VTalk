@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { UserAvatar } from "@/components/common/Avatar";
 import { timeAgo } from "@/lib/utils";
 import type { Chat } from "@/types/models";
@@ -12,7 +11,6 @@ export function ChatListItem({
   active: boolean;
   onClick: () => void;
 }) {
-  const navigate = useNavigate();
   const title =
     chat.type === "direct"
       ? chat.other?.display_name ?? chat.other?.username ?? "Direct"

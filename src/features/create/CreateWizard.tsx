@@ -14,20 +14,6 @@ import type { PostType, MediaType } from "@/types/database";
 
 const STEPS = ["Type", "Media", "Details", "Publish"] as const;
 
-function emptyDraft(): Omit<Draft, "id" | "updatedAt"> {
-  return {
-    type: "image",
-    content: "",
-    mediaUrls: [],
-    mediaType: "image",
-    codeSnippet: "",
-    codeLanguage: "",
-    location: "",
-    pollQuestion: "",
-    pollOptions: ["", ""],
-  };
-}
-
 export function CreateWizard() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();

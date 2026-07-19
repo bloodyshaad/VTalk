@@ -1,13 +1,12 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search as SearchIcon, X, TrendingUp, Hash } from "lucide-react";
+import { Search as SearchIcon, TrendingUp, Hash } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserAvatar } from "@/components/common/Avatar";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { EmptyState } from "@/components/common/EmptyState";
 import { useSearchStore, loadRecentFromStorage } from "@/stores/searchStore";
-import { cn } from "@/lib/utils";
 import type { SearchFilter } from "@/lib/api/search";
 
 const FILTERS: { value: SearchFilter; label: string }[] = [

@@ -1,5 +1,4 @@
 import { BadgeCheck } from "lucide-react";
-import { cn } from "@/lib/utils";
 import type { UserType } from "@/types/database";
 
 export function AccountTypeBadge({

@@ -11,7 +11,6 @@
  * by id) so a duplicate flush does not corrupt data.
  */
 
-import { getSupabase } from "@/lib/api/supabase";
 import type { CreatePostInput } from "@/lib/api/posts";
 import { createPost, deletePost } from "@/lib/api/posts";
 import { likePost, unlikePost } from "@/lib/api/likes";
@@ -33,7 +32,6 @@ export type ApplyResult = { ok: true } | { ok: false; error: string };
  * human-readable reason (op is kept and retried with backoff).
  */
 export async function applyOperation(op: PendingOp): Promise<ApplyResult> {
-  const supabase = getSupabase();
   const key = `${op.entity}:${op.operation}`;
   let parsed: unknown;
   try {

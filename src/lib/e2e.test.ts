@@ -61,7 +61,6 @@ describe("E2E message encryption", () => {
 
   describe("browser key persistence (localStorage)", () => {
     it("round-trips through the persisted-key API", async () => {
-      const alicePub = await initLocalKeyPair();
       const bobPub = await initLocalKeyPair(); // overwrites the single browser slot
       // Self-encrypt with the persisted (bob) key proves encrypt+decrypt symmetry.
       const enc = await encryptForPeer("self test", bobPub);

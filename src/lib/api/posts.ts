@@ -1,5 +1,5 @@
 import { getSupabase } from "./supabase";
-import type { Database, PostRow, PostType, MediaType } from "@/types/database";
+import type { PostRow, PostType, MediaType } from "@/types/database";
 import type { Post, MediaItem, UserSummary } from "@/types/models";
 
 type PostWithAuthor = PostRow & {

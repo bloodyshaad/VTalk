@@ -22,7 +22,7 @@ export function NotificationSettings() {
       setPrefs(merged);
       saveNotifPrefs(merged);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [serverPrefs]);
 
   useEffect(() => {

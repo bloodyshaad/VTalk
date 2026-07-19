@@ -17,7 +17,6 @@ export function DirectPage() {
     error,
     init,
     openChat,
-    refreshChats,
   } = useMessageStore();
 
   useEffect(() => {

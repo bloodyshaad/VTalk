@@ -1,4 +1,4 @@
-import { SettingsLayout, SettingsSection, SettingsRow } from "./SettingsLayout";
+import { SettingsLayout, SettingsSection } from "./SettingsLayout";
 import { useThemeStore, type Theme } from "@/stores/themeStore";
 import { cn } from "@/lib/utils";
 import { Monitor, Moon, Sun } from "lucide-react";

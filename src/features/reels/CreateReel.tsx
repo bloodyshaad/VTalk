@@ -24,10 +24,9 @@ export function CreateReel() {
 
   const submit = async () => {
     if (!file || !user) return;
-    setIsSubmitting(true);
-    try {
-      const ext = file.name.split(".").pop() ?? "mp4";
-      const url = await useUploadStore.getState().enqueue(file, "media");
+      setIsSubmitting(true);
+      try {
+        const url = await useUploadStore.getState().enqueue(file, "media");
       if (!url) throw new Error("Upload failed");
       await create({ video_url: url, caption: caption || null });
       navigate("/reels");

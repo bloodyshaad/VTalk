@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Bell, PanelLeft, Plus, Sun, Moon, LogOut, User as UserIcon } from "lucide-react";
+import { PanelLeft, Plus, Sun, Moon, LogOut, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {

@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 
@@ -12,7 +12,6 @@ const SECTIONS = [
 ];
 
 export function SettingsLayout({ children }: { children: React.ReactNode }) {
-  const location = useLocation();
   return (
     <div className="mx-auto max-w-4xl px-4 py-6">
       <h1 className="mb-6 text-2xl font-bold">Settings</h1>

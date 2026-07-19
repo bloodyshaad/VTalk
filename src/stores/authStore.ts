@@ -42,7 +42,7 @@ async function persistSessionInTauri(accessToken: string | undefined) {
   }
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   session: null,
   profile: null,

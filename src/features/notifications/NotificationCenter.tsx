@@ -13,7 +13,6 @@ export function NotificationCenter() {
     fetch,
     markRead,
     markAllRead,
-    open,
     close,
     toggle,
   } = useNotificationStore();

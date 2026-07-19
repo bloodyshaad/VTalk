@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { check, type Update } from "@tauri-apps/plugin-updater";
+import { check } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 
 interface UpdaterState {
@@ -12,8 +12,6 @@ interface UpdaterState {
   checkForUpdate: () => Promise<void>;
   restartAndInstall: () => Promise<void>;
 }
-
-let pendingUpdate: Update | null = null;
 
 export const useUpdaterStore = create<UpdaterState>((set, get) => ({
   checking: false,
@@ -41,7 +39,6 @@ export const useUpdaterStore = create<UpdaterState>((set, get) => ({
       await update.downloadAndInstall((event) => {
         if (event.event === "Finished") set({ downloading: false });
       });
-      pendingUpdate = update;
       set({ updateReady: true, checking: false, downloading: false });
     } catch (err) {
       set({

@@ -9,7 +9,7 @@ import { useMessageStore } from "@/stores/messageStore";
 import type { Chat } from "@/types/models";
 
 export function ChatView({ chat }: { chat: Chat }) {
-  const { messages, isLoadingMessages, send, peer } = useMessageStore();
+  const { messages, isLoadingMessages, send } = useMessageStore();
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

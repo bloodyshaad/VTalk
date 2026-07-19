@@ -4,7 +4,7 @@
   "pub_date": "2026-07-19T00:00:00Z",
   "platforms": {
     "windows-x86_64": {
-      "url": "https://github.com/anomalyco/vtalk/releases/download/v0.3.0/VTalk_0.3.0_x64-setup.exe",
+      "url": "https://github.com/bloodyshaad/VTalk/releases/download/v0.3.0/VTalk_0.3.0_x64-setup.exe",
       "signature": ""
     }
   }

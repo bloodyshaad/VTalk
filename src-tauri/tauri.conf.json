@@ -45,7 +45,7 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "https://raw.githubusercontent.com/anomalyco/vtalk/main/updates/latest.json"
+        "https://raw.githubusercontent.com/bloodyshaad/VTalk/main/updates/latest.json"
       ],
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDhCMjc0QTE3Njg3MzhDQQpSV1RLT0lkMm9YU3lDR0Z1Y1ZzdkJDS0dhNHl4TEFwbDRhOVdkeXkzcmkzZGRxRmxZSHRMTGNkTwo="
     }

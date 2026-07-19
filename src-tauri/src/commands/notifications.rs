@@ -19,9 +19,7 @@ pub fn request_notification_permission(app: tauri::AppHandle) -> Result<(), Stri
 }
 
 #[tauri::command]
-pub fn get_notification_settings(
-    app: tauri::AppHandle,
-) -> Result<NotificationSettings, String> {
+pub fn get_notification_settings(app: tauri::AppHandle) -> Result<NotificationSettings, String> {
     let svc = app.state::<crate::desktop_service::notification_service::NotificationService>();
     Ok(svc.settings())
 }

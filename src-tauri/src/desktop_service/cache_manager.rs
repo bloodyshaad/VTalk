@@ -71,12 +71,7 @@ impl CacheManager {
     }
 
     fn current_size(&self) -> u64 {
-        self.entries
-            .lock()
-            .unwrap()
-            .values()
-            .map(|e| e.size)
-            .sum()
+        self.entries.lock().unwrap().values().map(|e| e.size).sum()
     }
 
     fn evict_if_needed(&self) {

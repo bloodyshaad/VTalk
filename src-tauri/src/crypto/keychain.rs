@@ -7,8 +7,8 @@
 //! `keyring` crate. The public key is NOT secret and may stay in the normal
 //! store / Supabase profile.
 
-use keyring::Entry;
 use base64::Engine;
+use keyring::Entry;
 
 const SERVICE: &str = "vtalk-e2e";
 const PRIVATE_USER: &str = "private-key";

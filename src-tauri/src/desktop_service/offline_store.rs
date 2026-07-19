@@ -18,7 +18,9 @@ impl OfflineStore {
     /// Lock the connection, returning an error instead of panicking if the
     /// mutex is poisoned (e.g. another thread panicked while holding it).
     fn lock(&self) -> Result<std::sync::MutexGuard<'_, Connection>, String> {
-        self.conn.lock().map_err(|_| "offline store mutex poisoned".to_string())
+        self.conn
+            .lock()
+            .map_err(|_| "offline store mutex poisoned".to_string())
     }
 
     /// Open (and migrate) the offline database inside the app data directory.
@@ -122,7 +124,8 @@ impl OfflineStore {
                 })
             })
             .map_err(|e| e.to_string())?;
-        rows.collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())
+        rows.collect::<Result<Vec<_>, _>>()
+            .map_err(|e| e.to_string())
     }
 
     // --- Drafts -------------------------------------------------------------
@@ -167,7 +170,8 @@ impl OfflineStore {
                 })
             })
             .map_err(|e| e.to_string())?;
-        rows.collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())
+        rows.collect::<Result<Vec<_>, _>>()
+            .map_err(|e| e.to_string())
     }
 
     pub fn delete_draft(&self, id: &str) -> Result<(), String> {
@@ -209,7 +213,8 @@ impl OfflineStore {
                 })
             })
             .map_err(|e| e.to_string())?;
-        rows.collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())
+        rows.collect::<Result<Vec<_>, _>>()
+            .map_err(|e| e.to_string())
     }
 
     pub fn clear_operation(&self, id: &str) -> Result<(), String> {
@@ -301,7 +306,8 @@ impl OfflineStore {
                 })
             })
             .map_err(|e| e.to_string())?;
-        rows.collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())
+        rows.collect::<Result<Vec<_>, _>>()
+            .map_err(|e| e.to_string())
     }
 }
 

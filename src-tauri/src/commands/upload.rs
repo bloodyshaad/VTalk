@@ -10,7 +10,11 @@ pub fn init_upload(
     let queue = app.state::<crate::desktop_service::upload_queue::UploadQueue>();
     // Uploads are scoped by the authenticated user. The frontend supplies the
     // real user id; fall back to "local" only when none is provided.
-    queue.init_upload(&user_id.unwrap_or_else(|| "local".to_string()), &file_path, &bucket)
+    queue.init_upload(
+        &user_id.unwrap_or_else(|| "local".to_string()),
+        &file_path,
+        &bucket,
+    )
 }
 
 #[tauri::command]

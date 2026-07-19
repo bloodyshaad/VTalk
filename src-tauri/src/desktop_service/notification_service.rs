@@ -34,7 +34,10 @@ impl NotificationService {
 
     /// Show a toast, throttled to at most one per 200ms.
     pub fn show(&self, title: &str, body: &str, icon: Option<&str>) -> Result<(), String> {
-        let mut last = self.last_sent.lock().map_err(|_| "notification mutex poisoned".to_string())?;
+        let mut last = self
+            .last_sent
+            .lock()
+            .map_err(|_| "notification mutex poisoned".to_string())?;
         let now = std::time::Instant::now();
         if now.duration_since(*last).as_millis() < 200 {
             std::thread::sleep(std::time::Duration::from_millis(200));

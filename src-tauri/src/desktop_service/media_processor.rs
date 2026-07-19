@@ -38,7 +38,11 @@ impl MediaProcessor {
     /// Process a video: probe dimensions and (if ffmpeg available) transcode.
     pub fn process_video(&self, path: &str) -> Result<ProcessedMedia, String> {
         let meta = media::thumbnail::get_metadata(path)?;
-        let transcoded = if Path::new(path).extension().map(|e| e == "mp4").unwrap_or(false) {
+        let transcoded = if Path::new(path)
+            .extension()
+            .map(|e| e == "mp4")
+            .unwrap_or(false)
+        {
             None
         } else {
             media::transcoder::transcode(path, "mp4").ok()

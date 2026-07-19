@@ -67,11 +67,7 @@ pub async fn mark_synced(app: tauri::AppHandle, ids: Vec<String>) -> Result<(), 
 
 /// Frontend reports an operation that failed to apply.
 #[tauri::command]
-pub async fn mark_failed(
-    app: tauri::AppHandle,
-    id: String,
-    error: String,
-) -> Result<(), String> {
+pub async fn mark_failed(app: tauri::AppHandle, id: String, error: String) -> Result<(), String> {
     let mgr = app.state::<SyncManager>();
     mgr.mark_failed(&id, &error)
 }

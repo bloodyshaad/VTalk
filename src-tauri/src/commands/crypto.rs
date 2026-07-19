@@ -1,4 +1,4 @@
-use crate::config::auth::{SESSION_STORE};
+use crate::config::auth::SESSION_STORE;
 use crate::crypto;
 use crate::crypto::keychain;
 use crate::crypto::ratchet::RatchetState;
@@ -123,18 +123,19 @@ pub fn ratchet_init(
     is_initiator: bool,
 ) -> Result<(), String> {
     let secret = B64.decode(shared_secret_b64).map_err(|e| e.to_string())?;
-    let mut map = RATCHETS.lock().map_err(|_| "ratchet map poisoned".to_string())?;
+    let mut map = RATCHETS
+        .lock()
+        .map_err(|_| "ratchet map poisoned".to_string())?;
     map.insert(chat_id, RatchetState::new(&secret, is_initiator));
     Ok(())
 }
 
 /// Encrypt the next message on a chat's sending chain.
 #[tauri::command]
-pub fn ratchet_encrypt(
-    chat_id: String,
-    plaintext: String,
-) -> Result<RatchetEncrypted, String> {
-    let mut map = RATCHETS.lock().map_err(|_| "ratchet map poisoned".to_string())?;
+pub fn ratchet_encrypt(chat_id: String, plaintext: String) -> Result<RatchetEncrypted, String> {
+    let mut map = RATCHETS
+        .lock()
+        .map_err(|_| "ratchet map poisoned".to_string())?;
     let state = map
         .get_mut(&chat_id)
         .ok_or("ratchet not initialised for this chat; call ratchet_init")?;
@@ -152,7 +153,9 @@ pub fn ratchet_decrypt(
     ciphertext: Vec<u8>,
     nonce: Vec<u8>,
 ) -> Result<String, String> {
-    let mut map = RATCHETS.lock().map_err(|_| "ratchet map poisoned".to_string())?;
+    let mut map = RATCHETS
+        .lock()
+        .map_err(|_| "ratchet map poisoned".to_string())?;
     let state = map
         .get_mut(&chat_id)
         .ok_or("ratchet not initialised for this chat; call ratchet_init")?;
@@ -163,7 +166,9 @@ pub fn ratchet_decrypt(
 /// Safety number for out-of-band verification of a chat's ratchet.
 #[tauri::command]
 pub fn ratchet_safety_number(chat_id: String) -> Result<String, String> {
-    let map = RATCHETS.lock().map_err(|_| "ratchet map poisoned".to_string())?;
+    let map = RATCHETS
+        .lock()
+        .map_err(|_| "ratchet map poisoned".to_string())?;
     let state = map
         .get(&chat_id)
         .ok_or("ratchet not initialised for this chat; call ratchet_init")?;

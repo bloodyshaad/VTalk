@@ -18,7 +18,9 @@ pub fn get_session(app: tauri::AppHandle) -> Result<Option<String>, String> {
     let store = app
         .store(SESSION_STORE)
         .map_err(|e| format!("failed to open store: {e}"))?;
-    Ok(store.get(SESSION_KEY).and_then(|v| v.as_str().map(|s| s.to_string())))
+    Ok(store
+        .get(SESSION_KEY)
+        .and_then(|v| v.as_str().map(|s| s.to_string())))
 }
 
 #[tauri::command]
@@ -38,5 +40,8 @@ pub fn has_session(app: tauri::AppHandle) -> Result<bool, String> {
     let store = app
         .store(SESSION_STORE)
         .map_err(|e| format!("failed to open store: {e}"))?;
-    Ok(store.get(SESSION_KEY).map(|v| !v.is_null()).unwrap_or(false))
+    Ok(store
+        .get(SESSION_KEY)
+        .map(|v| !v.is_null())
+        .unwrap_or(false))
 }

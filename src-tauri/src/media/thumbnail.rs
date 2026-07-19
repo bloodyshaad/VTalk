@@ -82,10 +82,8 @@ pub fn optimize_image(path: &str, quality: u8) -> Result<String, String> {
     let mut buf = Vec::new();
     {
         let mut cursor = std::io::Cursor::new(&mut buf);
-        let mut encoder = image::codecs::jpeg::JpegEncoder::new_with_quality(
-            &mut cursor,
-            quality.clamp(1, 100),
-        );
+        let mut encoder =
+            image::codecs::jpeg::JpegEncoder::new_with_quality(&mut cursor, quality.clamp(1, 100));
         encoder
             .encode(
                 resized.as_bytes(),

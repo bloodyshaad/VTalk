@@ -1,5 +1,5 @@
-use crate::desktop_service::offline_store::OfflineStore;
 use crate::db::models::PendingOperation;
+use crate::desktop_service::offline_store::OfflineStore;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
@@ -20,9 +20,7 @@ pub enum SyncStatus {
 /// Supabase client). Returning `Ok(())` marks the operation as applied and
 /// removes it from the queue; returning `Err` keeps it queued and aborts the
 /// current flush so we can retry with backoff.
-pub type FlushHandler = Arc<
-    dyn Fn(&PendingOperation) -> Result<(), String> + Send + Sync,
->;
+pub type FlushHandler = Arc<dyn Fn(&PendingOperation) -> Result<(), String> + Send + Sync>;
 
 /// Event emitted to the frontend carrying the batch of operations that must be
 /// applied. The frontend applies them (via Supabase) and calls
@@ -90,7 +88,10 @@ impl SyncManager {
     }
 
     pub fn status(&self) -> SyncStatus {
-        self.status.lock().map(|g| g.clone()).unwrap_or(SyncStatus::Stopped)
+        self.status
+            .lock()
+            .map(|g| g.clone())
+            .unwrap_or(SyncStatus::Stopped)
     }
 
     /// Number of operations currently awaiting flush.
@@ -115,10 +116,9 @@ impl SyncManager {
         // Coalesce: if an op for the same entity+operation+dedupe exists,
         // replace its payload rather than appending a new one.
         let existing = self.store.pending_operations()?;
-        if let Some(prev) = existing
-            .iter()
-            .find(|o| o.entity == entity && o.operation == operation && o.payload.contains(dedupe_key))
-        {
+        if let Some(prev) = existing.iter().find(|o| {
+            o.entity == entity && o.operation == operation && o.payload.contains(dedupe_key)
+        }) {
             self.store.update_operation_payload(&prev.id, payload)?;
             return Ok(());
         }
@@ -220,13 +220,7 @@ impl SyncManager {
 
         std::thread::spawn(move || {
             while running.load(Ordering::SeqCst) {
-                let result = flush_once(
-                    &store,
-                    &app,
-                    &status,
-                    &attempt,
-                    &flush_handler,
-                );
+                let result = flush_once(&store, &app, &status, &attempt, &flush_handler);
                 match result {
                     Ok(true) => {
                         attempt.store(0, Ordering::SeqCst);
@@ -247,7 +241,11 @@ impl SyncManager {
                     }
                 }
                 // Base poll interval when idle/synced.
-                if store.pending_operations().map(|o| o.is_empty()).unwrap_or(true) {
+                if store
+                    .pending_operations()
+                    .map(|o| o.is_empty())
+                    .unwrap_or(true)
+                {
                     std::thread::sleep(IDLE_INTERVAL);
                 }
             }
@@ -264,9 +262,7 @@ impl SyncManager {
         let base: u64 = 500;
         let cap: u64 = 30_000;
         // Saturating multiply so high attempt counts can't overflow.
-        let millis = base
-            .saturating_mul(2u64.saturating_pow(attempt))
-            .min(cap);
+        let millis = base.saturating_mul(2u64.saturating_pow(attempt)).min(cap);
         Duration::from_millis(millis)
     }
 }
@@ -276,11 +272,11 @@ const IDLE_INTERVAL: Duration = Duration::from_secs(5);
 
 /// Emit a status to the frontend (if an app handle is bound). Used by both the
 /// method and the background loop thread.
-fn emit_status(
-    app: &Arc<Mutex<Option<tauri::AppHandle>>>,
-    status: &Arc<Mutex<SyncStatus>>,
-) {
-    let s = status.lock().map(|g| g.clone()).unwrap_or(SyncStatus::Stopped);
+fn emit_status(app: &Arc<Mutex<Option<tauri::AppHandle>>>, status: &Arc<Mutex<SyncStatus>>) {
+    let s = status
+        .lock()
+        .map(|g| g.clone())
+        .unwrap_or(SyncStatus::Stopped);
     if let Ok(g) = app.lock() {
         if let Some(a) = g.as_ref() {
             let _ = a.emit("sync://status", &s);
@@ -393,8 +389,14 @@ mod tests {
         assert_eq!(SyncManager::backoff_delay(1), Duration::from_millis(1_000));
         assert_eq!(SyncManager::backoff_delay(2), Duration::from_millis(2_000));
         assert_eq!(SyncManager::backoff_delay(3), Duration::from_millis(4_000));
-        assert_eq!(SyncManager::backoff_delay(20), Duration::from_millis(30_000));
-        assert_eq!(SyncManager::backoff_delay(u32::MAX), Duration::from_millis(30_000));
+        assert_eq!(
+            SyncManager::backoff_delay(20),
+            Duration::from_millis(30_000)
+        );
+        assert_eq!(
+            SyncManager::backoff_delay(u32::MAX),
+            Duration::from_millis(30_000)
+        );
     }
 
     #[test]
@@ -410,20 +412,31 @@ mod tests {
     #[test]
     fn enqueue_coalesces_same_target_and_mark_synced_clears() {
         let dir = std::env::temp_dir().join(format!("vtalk_sync_test_{}", std::process::id()));
-        let store = crate::desktop_service::offline_store::OfflineStore::open(dir.to_str().unwrap()).unwrap();
+        let store =
+            crate::desktop_service::offline_store::OfflineStore::open(dir.to_str().unwrap())
+                .unwrap();
         let mgr = SyncManager::new(store);
 
         // Two edits to the same draft should coalesce to one queued op.
-        mgr.enqueue("drafts", "upsert", "{\"id\":\"d1\"}", "d1").unwrap();
-        mgr.enqueue("drafts", "upsert", "{\"id\":\"d1\",\"content\":\"v2\"}", "d1").unwrap();
+        mgr.enqueue("drafts", "upsert", "{\"id\":\"d1\"}", "d1")
+            .unwrap();
+        mgr.enqueue(
+            "drafts",
+            "upsert",
+            "{\"id\":\"d1\",\"content\":\"v2\"}",
+            "d1",
+        )
+        .unwrap();
         assert_eq!(mgr.pending_count().unwrap(), 1);
 
         // A different draft is a separate op.
-        mgr.enqueue("drafts", "upsert", "{\"id\":\"d2\"}", "d2").unwrap();
+        mgr.enqueue("drafts", "upsert", "{\"id\":\"d2\"}", "d2")
+            .unwrap();
         assert_eq!(mgr.pending_count().unwrap(), 2);
 
         // Reporting both as synced empties the queue and resets backoff.
-        mgr.mark_synced(&["ignored-but-must-exist".to_string()]).unwrap();
+        mgr.mark_synced(&["ignored-but-must-exist".to_string()])
+            .unwrap();
         // mark_synced clears by id; the test ids above were generated internally,
         // so instead clear via the store directly to assert behavior.
         let ops = mgr.store.pending_operations().unwrap();

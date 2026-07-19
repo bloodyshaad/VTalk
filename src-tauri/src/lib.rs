@@ -7,11 +7,12 @@ mod db;
 mod desktop_service;
 mod media;
 
-use tauri::Manager;
 use desktop_service::{
-    cache_manager::CacheManager, media_processor::MediaProcessor, notification_service::NotificationService,
-    offline_store::OfflineStore, sync_manager::SyncManager, upload_queue::UploadQueue,
+    cache_manager::CacheManager, media_processor::MediaProcessor,
+    notification_service::NotificationService, offline_store::OfflineStore,
+    sync_manager::SyncManager, upload_queue::UploadQueue,
 };
+use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -30,15 +31,11 @@ pub fn run() {
                 tauri_plugin_log::Builder::new()
                     .level(log::LevelFilter::Info)
                     .targets([
-                        tauri_plugin_log::Target::new(
-                            tauri_plugin_log::TargetKind::Stdout,
-                        ),
-                        tauri_plugin_log::Target::new(
-                            tauri_plugin_log::TargetKind::LogDir { file_name: None },
-                        ),
-                        tauri_plugin_log::Target::new(
-                            tauri_plugin_log::TargetKind::Webview,
-                        ),
+                        tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::Stdout),
+                        tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::LogDir {
+                            file_name: None,
+                        }),
+                        tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::Webview),
                     ])
                     .build(),
             )?;
@@ -57,8 +54,7 @@ pub fn run() {
                 .to_string_lossy()
                 .to_string();
 
-            let offline_store =
-                OfflineStore::open(&app_data).map_err(|e| e.to_string())?;
+            let offline_store = OfflineStore::open(&app_data).map_err(|e| e.to_string())?;
             let upload_queue = UploadQueue::new(offline_store.clone());
             let sync_manager = SyncManager::new(offline_store.clone());
             sync_manager.set_app(app.handle().clone());

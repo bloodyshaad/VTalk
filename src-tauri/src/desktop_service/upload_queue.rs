@@ -87,8 +87,11 @@ impl UploadQueue {
         if let Some(item) = items.get_mut(id) {
             item.paused = true;
             item.status = UploadStatus::Paused;
-            self.store
-                .update_upload_status(id, "paused", item.offset as i64 * 100 / item.total.max(1) as i64)?;
+            self.store.update_upload_status(
+                id,
+                "paused",
+                item.offset as i64 * 100 / item.total.max(1) as i64,
+            )?;
             Ok(())
         } else {
             Err("upload not found".to_string())
@@ -100,8 +103,11 @@ impl UploadQueue {
         if let Some(item) = items.get_mut(id) {
             item.paused = false;
             item.status = UploadStatus::Uploading;
-            self.store
-                .update_upload_status(id, "uploading", item.offset as i64 * 100 / item.total.max(1) as i64)?;
+            self.store.update_upload_status(
+                id,
+                "uploading",
+                item.offset as i64 * 100 / item.total.max(1) as i64,
+            )?;
             Ok(())
         } else {
             Err("upload not found".to_string())

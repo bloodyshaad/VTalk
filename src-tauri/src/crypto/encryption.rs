@@ -17,15 +17,10 @@ pub fn encrypt(shared_secret: &[u8], plaintext: &[u8]) -> Result<(Vec<u8>, Vec<u
 }
 
 /// Decrypt ciphertext with AES-256-GCM.
-pub fn decrypt(
-    shared_secret: &[u8],
-    ciphertext: &[u8],
-    nonce: &[u8],
-) -> Result<Vec<u8>, String> {
+pub fn decrypt(shared_secret: &[u8], ciphertext: &[u8], nonce: &[u8]) -> Result<Vec<u8>, String> {
     let key = derive_key(shared_secret);
     let cipher = Aes256Gcm::new_from_slice(&key).map_err(|e| e.to_string())?;
-    let nonce_array =
-        Nonce::from_slice(nonce);
+    let nonce_array = Nonce::from_slice(nonce);
     let plaintext = cipher
         .decrypt(nonce_array, ciphertext)
         .map_err(|e| format!("decryption failed: {e}"))?;

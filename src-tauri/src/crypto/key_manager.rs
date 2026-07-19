@@ -11,10 +11,7 @@ pub fn generate_key_pair() -> (Vec<u8>, Vec<u8>) {
 /// Derive the shared secret (used for E2E key exchange) from our private key
 /// and the recipient's public key, then return the raw bytes for use as an
 /// AES key seed.
-pub fn derive_shared_secret(
-    our_private: &[u8],
-    their_public: &[u8],
-) -> Result<Vec<u8>, String> {
+pub fn derive_shared_secret(our_private: &[u8], their_public: &[u8]) -> Result<Vec<u8>, String> {
     if our_private.len() != 32 || their_public.len() != 32 {
         return Err("invalid key length".to_string());
     }

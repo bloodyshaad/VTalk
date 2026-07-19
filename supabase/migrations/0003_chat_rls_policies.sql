@@ -43,3 +43,30 @@ CREATE POLICY "messages_insert" ON messages FOR INSERT WITH CHECK (
       AND cm.user_id = auth.uid()
   )
 );
+
+DROP POLICY IF EXISTS "messages_update_own" ON messages;
+CREATE POLICY "messages_update_own" ON messages FOR UPDATE USING (
+  auth.uid() = sender_id
+  AND EXISTS (
+    SELECT 1 FROM chat_members cm
+    WHERE cm.chat_id = messages.chat_id
+      AND cm.user_id = auth.uid()
+  )
+) WITH CHECK (
+  auth.uid() = sender_id
+  AND EXISTS (
+    SELECT 1 FROM chat_members cm
+    WHERE cm.chat_id = messages.chat_id
+      AND cm.user_id = auth.uid()
+  )
+);
+
+DROP POLICY IF EXISTS "messages_delete" ON messages;
+CREATE POLICY "messages_delete" ON messages FOR DELETE USING (
+  auth.uid() = sender_id
+  AND EXISTS (
+    SELECT 1 FROM chat_members cm
+    WHERE cm.chat_id = messages.chat_id
+      AND cm.user_id = auth.uid()
+  )
+);

@@ -562,8 +562,29 @@ CREATE POLICY "messages_insert" ON messages FOR INSERT WITH CHECK (
       AND cm.user_id = auth.uid()
   )
 );
-CREATE POLICY "messages_update_own" ON messages FOR UPDATE USING (auth.uid() = sender_id) WITH CHECK (auth.uid() = sender_id);
-CREATE POLICY "messages_delete" ON messages FOR DELETE USING (auth.uid() = sender_id);
+CREATE POLICY "messages_update_own" ON messages FOR UPDATE USING (
+  auth.uid() = sender_id
+  AND EXISTS (
+    SELECT 1 FROM chat_members cm
+    WHERE cm.chat_id = messages.chat_id
+      AND cm.user_id = auth.uid()
+  )
+) WITH CHECK (
+  auth.uid() = sender_id
+  AND EXISTS (
+    SELECT 1 FROM chat_members cm
+    WHERE cm.chat_id = messages.chat_id
+      AND cm.user_id = auth.uid()
+  )
+);
+CREATE POLICY "messages_delete" ON messages FOR DELETE USING (
+  auth.uid() = sender_id
+  AND EXISTS (
+    SELECT 1 FROM chat_members cm
+    WHERE cm.chat_id = messages.chat_id
+      AND cm.user_id = auth.uid()
+  )
+);
 CREATE POLICY "message_reads_select" ON message_reads FOR SELECT USING (user_id = auth.uid());
 CREATE POLICY "message_reads_insert" ON message_reads FOR INSERT WITH CHECK (user_id = auth.uid());
 

@@ -2,11 +2,19 @@ use crate::config::auth::{SESSION_KEY, SESSION_STORE};
 use tauri_plugin_store::StoreExt;
 
 #[tauri::command]
-pub fn store_session(app: tauri::AppHandle, token: String) -> Result<(), String> {
+pub fn store_session(
+    app: tauri::AppHandle,
+    access_token: String,
+    refresh_token: String,
+) -> Result<(), String> {
     let store = app
         .store(SESSION_STORE)
         .map_err(|e| format!("failed to open store: {e}"))?;
-    store.set(SESSION_KEY, serde_json::Value::String(token));
+    let payload = serde_json::json!({
+        "access": access_token,
+        "refresh": refresh_token,
+    });
+    store.set(SESSION_KEY, payload);
     store
         .save()
         .map_err(|e| format!("failed to persist session: {e}"))?;

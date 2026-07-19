@@ -29,16 +29,49 @@ interface AuthState {
   clearError: () => void;
 }
 
-async function persistSessionInTauri(accessToken: string | undefined) {
+async function persistSessionInTauri(
+  accessToken: string | undefined,
+  refreshToken?: string,
+) {
   try {
     const { invoke } = await import("@tauri-apps/api/core");
     if (accessToken) {
-      await invoke("store_session", { token: accessToken });
+      await invoke("store_session", {
+        accessToken,
+        refreshToken: refreshToken ?? accessToken,
+      });
     } else {
       await invoke("clear_session");
     }
   } catch {
     // Not running in Tauri (browser dev) — Supabase persists its own session.
+  }
+}
+
+/// Restore a session persisted in the Tauri keychain/store back into the
+/// Supabase client. Required because the Tauri webview localStorage does not
+/// reliably survive app restarts, so `supabase.auth.getSession()` can return
+/// null even though we previously stored a valid token. Without this, DB
+/// requests go out as the unauthenticated `anon` role and RLS policies that
+/// require `auth.uid() IS NOT NULL` (e.g. inserting into `chats`) fail.
+async function restoreSessionFromTauri(): Promise<boolean> {
+  try {
+    const { invoke } = await import("@tauri-apps/api/core");
+    const raw = (await invoke("get_session")) as string | null;
+    if (!raw) return false;
+    const { access, refresh } = JSON.parse(raw) as {
+      access: string;
+      refresh: string;
+    };
+    if (!access) return false;
+    const supabase = getSupabase();
+    const { error } = await supabase.auth.setSession({
+      access_token: access,
+      refresh_token: refresh,
+    });
+    return !error;
+  } catch {
+    return false;
   }
 }
 
@@ -53,6 +86,9 @@ export const useAuthStore = create<AuthState>((set) => ({
   refreshSession: async () => {
     set({ isLoading: true, error: null });
     try {
+      // Re-hydrate a session persisted in the Tauri store (survives
+      // restarts, unlike the webview localStorage) before reading it.
+      await restoreSessionFromTauri();
       const session = await apiGetSession();
       if (!session) {
         set({ session: null, user: null, profile: null, initialized: true });
@@ -90,7 +126,10 @@ export const useAuthStore = create<AuthState>((set) => ({
         session,
         profile,
       });
-      await persistSessionInTauri(session?.access_token);
+        await persistSessionInTauri(
+          session?.access_token,
+          session?.refresh_token,
+        );
     } catch (err) {
       set({ error: err instanceof Error ? err.message : "Login failed" });
       throw err;
@@ -114,7 +153,10 @@ export const useAuthStore = create<AuthState>((set) => ({
       const { data } = await supabase.auth.getSession();
       const profile = await ensureProfile(result.user.id, result.user.email ?? "");
       set({ user: result.user, session: data.session, profile });
-      await persistSessionInTauri(data.session?.access_token);
+      await persistSessionInTauri(
+        data.session?.access_token,
+        data.session?.refresh_token,
+      );
     } catch (err) {
       set({ error: err instanceof Error ? err.message : "Registration failed" });
       throw err;

@@ -174,13 +174,20 @@ export async function getOrCreateDirectChat(otherUserId: string): Promise<string
   if (error) throw new Error(error.message);
   const chatId = (created as { id: string }).id;
 
-    const { error: memberErr } = await supabase
+  // Join yourself first (policy: user_id = auth.uid()).
+  const { error: selfErr } = await supabase
     .from("chat_members")
-    .insert([
-      { chat_id: chatId, user_id: user.id },
-      { chat_id: chatId, user_id: otherUserId },
-    ]);
-  if (memberErr) throw new Error(memberErr.message);
+    .insert({ chat_id: chatId, user_id: user.id });
+  if (selfErr) throw new Error(selfErr.message);
+
+  // Add the peer as a separate, member-verified step. The relaxed
+  // chat_members_insert policy allows adding a member when the caller is
+  // already a member of that chat (which we just established above).
+  const { error: peerErr } = await supabase
+    .from("chat_members")
+    .insert({ chat_id: chatId, user_id: otherUserId });
+  if (peerErr) throw new Error(peerErr.message);
+
   return chatId;
 }
 

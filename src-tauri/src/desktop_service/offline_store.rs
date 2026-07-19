@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use crate::db::migrations;
 use crate::db::models::{CachedPost, CachedProfile, LocalDraft, PendingOperation};
 use rusqlite::{params, Connection};

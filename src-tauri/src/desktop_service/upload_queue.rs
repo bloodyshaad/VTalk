@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use crate::desktop_service::offline_store::OfflineStore;
 use std::collections::HashMap;
 use std::sync::Mutex;

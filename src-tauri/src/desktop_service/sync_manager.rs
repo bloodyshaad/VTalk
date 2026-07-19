@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use crate::db::models::PendingOperation;
 use crate::desktop_service::offline_store::OfflineStore;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};

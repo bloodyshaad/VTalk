@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use tauri_plugin_notification::NotificationExt;
 
 #[derive(serde::Serialize, Clone)]

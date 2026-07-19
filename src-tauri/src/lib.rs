@@ -22,6 +22,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .setup(|app| {
             // Logging is enabled in BOTH debug and release builds so that a
             // release standalone still surfaces errors. Logs go to the terminal

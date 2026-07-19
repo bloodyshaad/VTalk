@@ -17,7 +17,6 @@
     "notification:default",
     "log:default",
     "updater:default",
-    "updater:allow-restart",
     "process:default",
     "process:allow-relaunch"
   ]

@@ -1,10 +1,10 @@
 {
-  "version": "0.3.0",
-  "notes": "Current published version.",
+  "version": "0.3.2",
+  "notes": "Fix: restore persisted auth session on launch (resolves RLS 'new row violates row-level security policy for table chats'). Hardened chat/message RLS policies.",
   "pub_date": "2026-07-19T00:00:00Z",
   "platforms": {
     "windows-x86_64": {
-      "url": "https://github.com/bloodyshaad/VTalk/releases/download/v0.3.0/VTalk_0.3.0_x64-setup.exe",
+      "url": "https://github.com/bloodyshaad/VTalk/releases/download/v0.3.2/VTalk_0.3.2_x64-setup.exe",
       "signature": ""
     }
   }
